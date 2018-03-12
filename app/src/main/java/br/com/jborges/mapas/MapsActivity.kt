@@ -1,5 +1,7 @@
 package br.com.jborges.mapas
 
+import android.location.Address
+import android.location.Geocoder
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 
@@ -11,6 +13,7 @@ import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import kotlinx.android.synthetic.main.activity_maps.*
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -23,6 +26,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        btPesquisar.setOnClickListener{
+            val geocoder = Geocoder( this)
+            var address : List<Address>?
+            
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
