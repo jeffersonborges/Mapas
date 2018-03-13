@@ -19,6 +19,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.android.synthetic.main.activity_maps.*
 import android.content.DialogInterface
 import android.Manifest.permission.ACCESS_FINE_LOCATION
+import android.annotation.SuppressLint
 import android.support.v4.app.ActivityCompat
 import android.content.pm.PackageManager
 import android.support.v4.app.FragmentActivity
@@ -29,13 +30,40 @@ import com.google.android.gms.location.LocationRequest
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.OnConnectionFailedListener,
+        LocationListener {
 
     val REQUEST_GPS = 0
-    var mLocationRequest: LocationRequest? = null
+    private lateinit var mMap: GoogleMap
+    private lateinit var mGoogleApiClient: GoogleApiClient
+    lateinit var mLocationRequest: LocationRequest
+
+    @SuppressLint("MissingPermission")
+    protected fun createLocationRequest() {
+        //remove location updates so that it resets
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this) //Import should not be **android.Location.LocationListener**
+        //import should be **import com.google.android.gms.location.LocationListener**;
+
+        mLocationRequest = LocationRequest()
+        mLocationRequest.setInterval(10000)
+        mLocationRequest.setFastestInterval(5000)
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
+        //restart location updates with the new interval
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this)
+
+    }
+
+    override fun onLocationChanged(minhaLocalizacao: Location) {
+        mMap.clear()
+        adicionarMarcador(minhaLocalizacao.latitude,
+                minhaLocalizacao.longitude,
+                "Não somos Shakira mas estoy aqui")
+    }
 
     override fun onConnected(p0: Bundle?) {
         checkPermission()
+
+        createLocationRequest();
 
         val minhaLocalizacao = LocationServices
                 .FusedLocationApi
@@ -105,8 +133,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
     }
 
 
-    private lateinit var mMap: GoogleMap
-    private lateinit var mGoogleApiClient: GoogleApiClient
+    public override fun onDestroy() {
+        mGoogleApiClient.disconnect()
+        super.onDestroy()
+    }
 
     @Synchronized
     fun callConnection() {
@@ -171,16 +201,4 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
         callConnection()
     }
 
-    public override fun onStart() {
-        super.onStart()
-        Log.d("TAG", "onStart fired ..............")
-        mGoogleApiClient.connect()
-    }
-
-    public override fun onStop() {
-        super.onStop()
-        Log.d("TAG", "onStop fired ..............")
-        mGoogleApiClient.disconnect()
-        Log.d("TAG", "isConnected ...............: " + mGoogleApiClient.isConnected)
-    }
 }
