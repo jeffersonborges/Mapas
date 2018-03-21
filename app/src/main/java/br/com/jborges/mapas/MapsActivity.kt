@@ -62,6 +62,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
 
     override fun onConnected(p0: Bundle?) {
         checkPermission()
+        mMap.clear()
 
         createLocationRequest();
 
