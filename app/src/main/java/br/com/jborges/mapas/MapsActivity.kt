@@ -162,7 +162,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback,
             mMap.clear()
 
             val geocoder = Geocoder(this)
-            var address: List<Address>?
+            var address: List<Address>? 
 
             address = geocoder
                     .getFromLocationName(etEndereco.text.toString(), 1)
